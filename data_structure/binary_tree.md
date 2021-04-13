@@ -1,51 +1,247 @@
+1. [二叉树](#二叉树)
+   1. [知识点](#知识点)
+      1. [二叉树的实现](#二叉树的实现)
+      2. [二叉树遍历](#二叉树遍历)
+         1. [递归模板](#递归模板)
+         2. [前序非递归](#前序非递归)
+         3. [中序非递归](#中序非递归)
+         4. [后序非递归](#后序非递归)
+         5. [BFS 层次遍历](#bfs-层次遍历)
+      3. [分治法应用](#分治法应用)
+   2. [常见题目示例](#常见题目示例)
+      1. [maximum-depth-of-binary-tree](#maximum-depth-of-binary-tree)
+      2. [balanced-binary-tree](#balanced-binary-tree)
+      3. [binary-tree-maximum-path-sum](#binary-tree-maximum-path-sum)
+      4. [lowest-common-ancestor-of-a-binary-tree](#lowest-common-ancestor-of-a-binary-tree)
+      5. [BFS 层次应用](#bfs-层次应用)
+      6. [binary-tree-zigzag-level-order-traversal](#binary-tree-zigzag-level-order-traversal)
+      7. [二叉搜索树应用](#二叉搜索树应用)
+      8. [validate-binary-search-tree](#validate-binary-search-tree)
+         1. [insert-into-a-binary-search-tree](#insert-into-a-binary-search-tree)
+   3. [总结](#总结)
+   4. [练习](#练习)
+
 # 二叉树
+二叉树是一种非常重要的数据结构。
 
 ## 知识点
 
+### 二叉树的实现
+
+
+```python
+"""Implementation of a Binary Tree.
+"""
+
+
+class Node:
+    """The Node Class defines the structure of a Node"""
+
+    def __init__(self, value: int) -> None:
+        """Initialize Node with value.
+
+        Args:
+            value: value of current node.
+
+        examples:
+        >>> root = Node(10)
+        >>> print(root)
+        10
+        >>> root.left = Node(5)
+        >>> root.right = Node(3)
+
+        # example Tree Structure
+        #          10
+        #        /    \
+        #        5      3
+        #     /    \  /    \
+        #  None  None None None
+        """
+        self.root_value = value
+        self.left = None
+        self.right = None
+
+    def __str__(self) -> str:
+        return str(self.root_value)
+
+    def insert(self, value: int):
+        """Insert value into node.
+
+        Args:
+            value (int): value to be inserted.
+
+        examples:
+        >>> tree = Node(10)
+        >>> print(tree)
+        10
+        >>> tree.insert(5)
+        >>> print(tree.left)
+        5
+        >>> tree.insert(12)
+        >>> print(tree.right)
+        12
+        >>> tree.insert(7)
+        >>> print(tree.left.right)
+        7
+        >>> tree.insert(11)
+        >>> print(tree.right.left)
+        11
+
+        # example Tree Structure
+        #          10
+        #        /    \
+        #        5      12
+        #     /    \  /    \
+        #  None    7 11 None
+        """
+        if not self.root_value:
+            self.root_value = value
+            return
+
+        # if value < root_value insert in left node
+        if value < self.root_value:
+            if not self.left:
+                self.left = Node(value)
+            else:
+                self.left.insert(value)
+        else:
+            if not self.right:
+                self.right = Node(value)
+            else:
+                self.right.insert(value)
+
+```
 ### 二叉树遍历
 
-**前序遍历**：**先访问根节点**，再前序遍历左子树，再前序遍历右子树
-**中序遍历**：先中序遍历左子树，**再访问根节点**，再中序遍历右子树
-**后序遍历**：先后序遍历左子树，再后序遍历右子树，**再访问根节点**
+树的遍历指的是按照某种规则，不重复地访问树的所有节点的过程。
 
-注意点
+根据访问节点的顺序不同，树的遍历可以分为深度优先遍历和广度优先遍历。深度优先遍历可细分为前序、中序以及后序遍历。
 
-- 以根访问顺序决定是什么遍历
-- 左子树都是优先右子树
+* 深度优先遍历
+  * 前序遍历：**先访问根节点**，再前序遍历左子树，再前序遍历右子树
+  * 中序遍历：先中序遍历左子树，**再访问根节点**，再中序遍历右子树
+  * 后序遍历：先后序遍历左子树，再后序遍历右子树，**再访问根节点**
+* 广度优先遍历（也称层次遍历）
+
+树的定义是递归定义，因此用递归实现树的三种（前序、中序、后序）遍历容易理解且代码简洁。
+
+> 相对来说深度优先应用更广泛，实现更简单，因此先不细讲广度优先遍历。
 
 #### 递归模板
 
 - 递归实现二叉树遍历非常简单，不同顺序区别仅在于访问父结点顺序
 
 ```Python
-def preorder_rec(root):
-    if root is None:
-        return
-    visit(root)
-    preorder_rec(root.left)
-    preorder_rec(root.right)
-    return
+def preoder_traversal(node: Node):
+    """In a preorder traversal, the root node is visited first,
+    followed by the left child, then the right child.
 
-def inorder_rec(root):
-    if root is None:
-        return
-    inorder_rec(root.left)
-    visit(root)
-    inorder_rec(root.right)
-    return
+    Args:
+        node (Node): Node to be traversaled.
 
-def postorder_rec(root):
-    if root is None:
+    examples:
+    >>> tree = Node(10)
+    >>> _ = [tree.insert(v) for v in [5, 12, 7, 11]]
+    >>> print(tree)
+    10
+    >>> print(tree.left)
+    5
+    >>> print(tree.right)
+    12
+    >>> print(tree.left.right)
+    7
+    >>> print(tree.right.left)
+    11
+    >>> preoder_traversal(tree)
+    10
+    5
+    7
+    12
+    11
+
+    # example Tree Structure
+    #          10
+    #        /    \
+    #        5      12
+    #     /    \  /    \
+    #  None    7 11   None
+
+    """
+    # import ipdb;ipdb.set_trace()
+    if node is None:
         return
-    postorder_rec(root.left)
-    postorder_rec(root.right)
-    visit(root)
-    return
+    print(node)
+    preoder_traversal(node.left)
+    preoder_traversal(node.right)
+
+
+def inoder_traversal(node: Node):
+    """In an inorder traversal, the left child is visited first,
+    followed by the parent node, then followed by the right child.
+
+    Args:
+        node (Node): Node to be traversaled.
+
+    examples:
+    >>> tree = Node(10)
+    >>> _ = [tree.insert(v) for v in [5, 12, 7, 11]]
+    >>> inoder_traversal(tree)
+    5
+    7
+    10
+    11
+    12
+
+    # example Tree Structure
+    #          10
+    #        /    \
+    #        5      12
+    #     /    \  /    \
+    #  None    7 11   None
+
+    """
+    if node is None:
+        return
+    inoder_traversal(node.left)
+    print(node)
+    inoder_traversal(node.right)
+
+
+def postoder_traversal(node: Node):
+    """In a postorder traversal, the left child is visited first, 
+    followed by the right child, then the root node.
+
+    Args:
+        node (Node): Node to be traversaled.
+
+    examples:
+    >>> tree = Node(10)
+    >>> _ = [tree.insert(v) for v in [5, 12, 7, 11]]
+    >>> postoder_traversal(tree)
+    7
+    5
+    11
+    12
+    10
+
+    # example Tree Structure
+    #          10
+    #        /    \
+    #        5      12
+    #     /    \  /    \
+    #  None    7 11   None
+
+    """
+    if node is None:
+        return
+    postoder_traversal(node.left)
+    postoder_traversal(node.right)
+    print(node)
 ```
 
 #### [前序非递归](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
 
-- 本质上是图的DFS的一个特例，因此可以用栈来实现
+- 本质上是图的 DFS 的一个特例，因此可以用栈来实现
 
 ```Python
 class Solution:
